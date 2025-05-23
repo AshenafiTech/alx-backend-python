@@ -5,7 +5,7 @@ def stream_users_in_batches(batch_size):
     """Yields batches of users from the user_data table."""
     conn = mysql.connector.connect(database=DB_NAME, **DB_CONFIG)
     cursor = conn.cursor(dictionary=True)
-    cursor.execute(f"SELECT * FROM {TABLE_NAME}")
+    cursor.execute("SELECT * FROM user_data")
     batch = []
     for row in cursor:
         batch.append(row)
