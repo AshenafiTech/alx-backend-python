@@ -16,6 +16,7 @@ def stream_users_in_batches(batch_size):
         yield batch
     cursor.close()
     conn.close()
+    return None
 
 def batch_processing(batch_size):
     """Processes each batch and prints users over the age of 25."""
