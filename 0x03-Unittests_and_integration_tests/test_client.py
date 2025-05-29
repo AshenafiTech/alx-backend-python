@@ -5,10 +5,10 @@ import os
 import unittest
 from unittest.mock import patch, PropertyMock
 from parameterized import parameterized, parameterized_class
-from client import GithubOrgClient
-from fixtures import org_payload, repos_payload, expected_repos, apache2_repos
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+from fixtures import org_payload, repos_payload, expected_repos, apache2_repos
+from client import GithubOrgClient
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -109,3 +109,6 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     def tearDownClass(cls):
         """Stop patcher"""
         cls.get_patcher.stop()
+
+if __name__ == "__main__":
+    unittest.main()
