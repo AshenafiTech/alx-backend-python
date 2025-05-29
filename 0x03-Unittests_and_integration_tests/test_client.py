@@ -81,7 +81,7 @@ class TestGithubOrgClient(unittest.TestCase):
     "repos_payload": repos_payload,
     "expected_repos": expected_repos,
     "apache2_repos": apache2_repos,
-}])
+}], class_name_func=None)
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Integration tests for GithubOrgClient.public_repos"""
 
