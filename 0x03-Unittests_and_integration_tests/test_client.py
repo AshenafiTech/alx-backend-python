@@ -69,6 +69,8 @@ class TestGithubOrgClient(unittest.TestCase):
     @parameterized.expand([
         ({"license": {"key": "my_license"}}, "my_license", True),
         ({"license": {"key": "other_license"}}, "my_license", False),
+        ({}, "my_license", False),  # No license key present at all
+        ({"license": {}}, "my_license", False),  # License exists but no key
     ])
     def test_has_license(self, repo, license_key, expected):
         """Test has_license returns True if repo has the given license key"""
