@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
+"""Unit tests for GithubOrgClient"""
 import sys
 import os
 import unittest
 from unittest.mock import patch, PropertyMock
 from parameterized import parameterized
+from client import GithubOrgClient
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-from client import GithubOrgClient
 
 
 class TestGithubOrgClient(unittest.TestCase):
