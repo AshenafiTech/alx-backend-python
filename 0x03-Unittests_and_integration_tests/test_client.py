@@ -2,7 +2,7 @@
 import sys
 import os
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 from parameterized import parameterized
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -30,7 +30,9 @@ class TestGithubOrgClient(unittest.TestCase):
     def test_public_repos_url(self):
         """Test that _public_repos_url returns expected value from org property"""
         payload = {"repos_url": "https://api.github.com/orgs/testorg/repos"}
-        with patch.object(GithubOrgClient, 'org', new_callable=property) as mock_org:
+        with patch.object(
+            GithubOrgClient, 'org', new_callable=PropertyMock
+        ) as mock_org:
             mock_org.return_value = payload
             client = GithubOrgClient("testorg")
             result = client._public_repos_url
@@ -50,7 +52,7 @@ class TestGithubOrgClient(unittest.TestCase):
         with patch.object(
             GithubOrgClient,
             '_public_repos_url',
-            new_callable=property
+            new_callable=PropertyMock
         ) as mock_public_repos_url:
             mock_public_repos_url.return_value = test_url
             client = GithubOrgClient("testorg")
