@@ -19,7 +19,7 @@ class TestGithubOrgClient(unittest.TestCase):
     ])
     @patch('client.get_json')
     def test_org(self, org_name, mock_get_json):
-        """Test that GithubOrgClient.org returns correct value and calls get_json"""
+        """Test GithubOrgclient.org returns correct value"""
         test_payload = {"login": org_name}
         mock_get_json.return_value = test_payload
 
@@ -32,7 +32,7 @@ class TestGithubOrgClient(unittest.TestCase):
         self.assertEqual(result, test_payload)
 
     def test_public_repos_url(self):
-        """Test that _public_repos_url returns expected value from org property"""
+        """Test _public_repos_url returns expected value from org"""
         payload = {"repos_url": "https://api.github.com/orgs/testorg/repos"}
         with patch.object(
             GithubOrgClient, 'org', new_callable=PropertyMock
@@ -44,7 +44,7 @@ class TestGithubOrgClient(unittest.TestCase):
 
     @patch('client.get_json')
     def test_public_repos(self, mock_get_json):
-        """Test that public_repos returns expected list and calls dependencies once"""
+        """Test public_repos returns expected list and calls dependencies"""
         test_payload = [
             {"name": "repo1"},
             {"name": "repo2"},
