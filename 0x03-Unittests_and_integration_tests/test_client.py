@@ -144,6 +144,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
         def side_effect(url):
             mock_response = unittest.mock.Mock()
+            mock_response.status_code = 200
             if url == "https://api.github.com/orgs/google":
                 mock_response.json.return_value = cls.org_payload
             elif url == cls.org_payload["repos_url"]:
