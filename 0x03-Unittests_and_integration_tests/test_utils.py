@@ -22,6 +22,16 @@ class TestAccessNestedMap(unittest.TestCase):
         """Test that access_nested_map returns expected result"""
         self.assertEqual(access_nested_map(nested_map, path), expected)
 
+    @parameterized.expand([
+        ({}, ("a",), "a"),
+        ({"a": 1}, ("a", "b"), "b"),
+    ])
+    def test_access_nested_map_exception(self, nested_map, path, expected_key):
+        """Test that access_nested_map raises KeyError on missing key"""
+        with self.assertRaises(KeyError) as cm:
+            access_nested_map(nested_map, path)
+        self.assertEqual(cm.exception.args[0], expected_key)
+
 
 class TestGetJson(unittest.TestCase):
     """Tests for the get_json function"""
@@ -34,6 +44,12 @@ class TestGetJson(unittest.TestCase):
         """Test that get_json returns expected JSON response"""
         mock_response = Mock()
         mock_response.json.return_value = test_payload
+
+        with patch("utils.requests.get",
+                   return_value=mock_response) as mock_get:
+            result = get_json(test_url)
+            mock_get.assert_called_once_with(test_url)
+            self.assertEqual(result, test_payload)
 
         with patch("utils.requests.get",
                    return_value=mock_response) as mock_get:
