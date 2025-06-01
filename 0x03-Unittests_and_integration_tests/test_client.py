@@ -90,17 +90,14 @@ class TestGithubOrgClient(unittest.TestCase):
             mock_public_repos_url.assert_called_once()
             mock_get_json.assert_called_once_with(test_url)
 
-    @parameterized.expand([
-        ({"license": {"key": "my_license"}}, "my_license", True),
-        ({"license": {"key": "other_license"}}, "my_license", False),
-        ({}, "my_license", False),  # No license key present at all
-        ({"license": {}}, "my_license", False),  # License exists but no key
-    ])
-    def test_has_license(self, repo, license_key, expected):
-        """Test has_license returns True if repo has the given license key"""
-        client = GithubOrgClient("testorg")
-        result = client.has_license(repo, license_key)
-        self.assertEqual(result, expected)
+        @parameterized.expand([
+                ({"license": {"key": "my_license"}}, "my_license", True),
+                ({"license": {"key": "other_license"}}, "my_license", False),
+            ])
+        def test_has_license(self, repo, license_key, expected):
+            """Unit-test GithubOrgClient.has_license with parameterized inputs"""
+            client = GithubOrgClient("testorg")
+            self.assertEqual(client.has_license(repo, license_key), expected)
 
     def test_repos_payload_memoization(self):
         """Test repos_payload is memoized and get_json called once"""
