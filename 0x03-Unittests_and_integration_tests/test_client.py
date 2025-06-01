@@ -66,6 +66,96 @@ class TestGithubOrgClient(unittest.TestCase):
             mock_public_repos_url.assert_called_once()
             mock_get_json.assert_called_once_with(test_url)
 
+    @patch('client.get_json')
+    def test_public_repos_with_license(self, mock_get_json):
+        """Test public_repos returns only repos with given license"""
+        test_payload = [
+            {"name": "repo1", "license": {"key": "apache-2.0"}},
+            {"name": "repo2", "license": {"key": "mit"}},
+            {"name": "repo3", "license": {"key": "apache-2.0"}},
+            {"name": "repo4", "license": None},
+        ]
+        mock_get_json.return_value = test_payload
+        test_url = "https://api.github.com/orgs/testorg/repos"
+
+        with patch.object(
+            GithubOrgClient,
+            '_public_repos_url',
+            new_callable=PropertyMock
+        ) as mock_public_repos_url:
+            mock_public_repos_url.return_value = test_url
+            client = GithubOrgClient("testorg")
+            result = client.public_repos(license="apache-2.0")
+            self.assertEqual(result, ["repo1", "repo3"])
+            mock_public_repos_url.assert_called_once()
+            mock_get_json.assert_called_once_with(test_url)
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False),
+        ({}, "my_license", False),  # No license key present at all
+        ({"license": {}}, "my_license", False),  # License exists but no key
+    ])
+    def test_has_license(self, repo, license_key, expected):
+        """Test has_license returns True if repo has the given license key"""
+        client = GithubOrgClient("testorg")
+        result = client.has_license(repo, license_key)
+        self.assertEqual(result, expected)
+
+    def test_repos_payload_memoization(self):
+        """Test repos_payload is memoized and get_json called once"""
+        with patch('client.get_json', return_value=[{"name": "repo"}]) as mock_get_json, \
+             patch.object(GithubOrgClient, '_public_repos_url', new_callable=PropertyMock) as mock_url:
+            mock_url.return_value = "url"
+            client = GithubOrgClient("testorg")
+            # Call twice, should only call get_json once due to memoization
+            client.repos_payload
+            client.repos_payload
+            mock_get_json.assert_called_once_with("url")
+
+    def test_org_memoization(self):
+        """Test org property is memoized and get_json called once"""
+        with patch('client.get_json', return_value={"login": "testorg"}) as mock_get_json:
+            client = GithubOrgClient("testorg")
+            client.org
+            client.org
+            mock_get_json.assert_called_once_with("https://api.github.com/orgs/testorg")
+        self.assertEqual(result, test_payload)
+
+    def test_public_repos_url(self):
+        """Test _public_repos_url returns expected value from org"""
+        payload = {"repos_url": "https://api.github.com/orgs/testorg/repos"}
+        with patch.object(
+            GithubOrgClient, 'org', new_callable=PropertyMock
+        ) as mock_org:
+            mock_org.return_value = payload
+            client = GithubOrgClient("testorg")
+            result = client._public_repos_url
+            self.assertEqual(result, payload["repos_url"])
+
+    @patch('client.get_json')
+    def test_public_repos(self, mock_get_json):
+        """Test public_repos returns expected list and calls dependencies"""
+        test_payload = [
+            {"name": "repo1"},
+            {"name": "repo2"},
+            {"name": "repo3"}
+        ]
+        mock_get_json.return_value = test_payload
+        test_url = "https://api.github.com/orgs/testorg/repos"
+
+        with patch.object(
+            GithubOrgClient,
+            '_public_repos_url',
+            new_callable=PropertyMock
+        ) as mock_public_repos_url:
+            mock_public_repos_url.return_value = test_url
+            client = GithubOrgClient("testorg")
+            result = client.public_repos()
+            self.assertEqual(result, ["repo1", "repo2", "repo3"])
+            mock_public_repos_url.assert_called_once()
+            mock_get_json.assert_called_once_with(test_url)
+
     @parameterized.expand([
         ({"license": {"key": "my_license"}}, "my_license", True),
         ({"license": {"key": "other_license"}}, "my_license", False),
