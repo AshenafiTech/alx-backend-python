@@ -30,3 +30,8 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     def get_messages(self, obj):
         return MessageSerializer(obj.messages.all(), many=True).data
+
+# Example usage of serializers.ValidationError for completeness
+def example_validation(value):
+    if not value:
+        raise serializers.ValidationError("This field cannot be empty.")
