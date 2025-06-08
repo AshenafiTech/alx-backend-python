@@ -19,12 +19,13 @@ class Conversation(models.Model):
     """
     Model to track which users are involved in a conversation.
     """
+    conversation_id = models.AutoField(primary_key=True)
     participants = models.ManyToManyField(User, related_name='conversations')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         usernames = ', '.join([user.username for user in self.participants.all()])
-        return f"Conversation {self.pk} between {usernames}"
+        return f"Conversation {self.conversation_id} between {usernames}"
 
 class Message(models.Model):
     """
