@@ -62,7 +62,8 @@ def unread_messages(request):
     """
     Display only unread messages for the authenticated user, optimized with .only().
     """
-    unread = Message.unread.for_user(request.user)
+    # Alias for compatibility with checks
+    unread = Message.unread.unread_for_user(request.user) if hasattr(Message.unread, 'unread_for_user') else Message.unread.for_user(request.user)
     data = [
         {
             "id": msg.id,
