@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-
 from .models import Message
 
 @api_view(['DELETE'])
@@ -32,3 +31,19 @@ def get_thread(message):
             'replies': get_thread(reply)
         })
     return thread
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def send_message(request):
+    content = request.data.get('content')
+    receiver_id = request.data.get('receiver')
+    parent_message_id = request.data.get('parent_message')
+    if not content or not receiver_id:
+        return Response({'error': 'Content and receiver are required.'}, status=status.HTTP_400_BAD_REQUEST)
+    message = Message.objects.create(
+        sender=request.user,
+        receiver_id=receiver_id,
+        content=content,
+        parent_message_id=parent_message_id if parent_message_id else None
+    )
+    return Response({'detail': 'Message sent.', 'message_id': message.id}, status=status.HTTP_201_CREATED)
