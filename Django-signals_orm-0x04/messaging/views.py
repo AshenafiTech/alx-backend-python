@@ -7,13 +7,15 @@ from .models import Message
 @api_view(['DELETE'])
 @permission_classes([permissions.IsAuthenticated])
 def delete_user(request):
+    """Allow a user to delete their own account."""
     user = request.user
     user.delete()
     return Response({"detail": "User account deleted."}, status=status.HTTP_204_NO_CONTENT)
 
-
 def get_conversation_with_threads(conversation_id):
-    # Fetch all messages in a conversation, with sender/receiver and replies prefetched
+    """
+    Fetch all top-level messages in a conversation, with sender/receiver and replies prefetched.
+    """
     messages = (
         Message.objects
         .filter(conversation_id=conversation_id, parent_message__isnull=True)
@@ -23,7 +25,9 @@ def get_conversation_with_threads(conversation_id):
     return messages
 
 def get_thread_queryset(message):
-    """Recursively fetch all replies to a message using Django ORM."""
+    """
+    Recursively fetch all replies to a message using Django ORM.
+    """
     replies = Message.objects.filter(parent_message=message).select_related('sender', 'receiver')
     thread = []
     for reply in replies:
@@ -36,6 +40,9 @@ def get_thread_queryset(message):
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def send_message(request):
+    """
+    Send a message, optionally as a reply (threaded).
+    """
     content = request.data.get('content')
     receiver_id = request.data.get('receiver')
     parent_message_id = request.data.get('parent_message')
@@ -52,6 +59,9 @@ def send_message(request):
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def unread_messages(request):
+    """
+    Display only unread messages for the authenticated user, optimized with .only().
+    """
     unread = Message.unread.for_user(request.user)
     data = [
         {

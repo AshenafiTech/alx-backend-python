@@ -1,11 +1,9 @@
 from django.db import models
 from django.conf import settings
-
-class UnreadMessagesManager(models.Manager):
-    def for_user(self, user):
-        return self.get_queryset().filter(receiver=user, read=False).only('id', 'sender', 'content', 'timestamp')
+from .managers import UnreadMessagesManager
 
 class Message(models.Model):
+    """Model representing a message, supporting threads and edit tracking."""
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='sent_messages', on_delete=models.CASCADE
     )
@@ -29,7 +27,7 @@ class Message(models.Model):
         related_name='replies',
         on_delete=models.CASCADE
     )
-    read = models.BooleanField(default=False)  # Indicates if message has been read
+    read = models.BooleanField(default=False)
 
     objects = models.Manager()  # Default manager
     unread = UnreadMessagesManager()  # Custom manager
@@ -38,6 +36,7 @@ class Message(models.Model):
         return f"From {self.sender} to {self.receiver} at {self.timestamp}"
 
 class Notification(models.Model):
+    """Stores notifications for users about messages."""
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='notifications', on_delete=models.CASCADE
     )
@@ -51,6 +50,7 @@ class Notification(models.Model):
         return f"Notification for {self.user} about message {self.message.id}"
 
 class MessageHistory(models.Model):
+    """Keeps a history of message edits."""
     message = models.ForeignKey(Message, related_name='history', on_delete=models.CASCADE)
     old_content = models.TextField()
     edited_at = models.DateTimeField(auto_now_add=True)
