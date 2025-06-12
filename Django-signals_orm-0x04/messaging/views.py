@@ -48,3 +48,18 @@ def send_message(request):
         parent_message_id=parent_message_id if parent_message_id else None
     )
     return Response({'detail': 'Message sent.', 'message_id': message.id}, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def unread_messages(request):
+    unread = Message.unread.for_user(request.user)
+    data = [
+        {
+            "id": msg.id,
+            "sender": msg.sender_id,
+            "content": msg.content,
+            "timestamp": msg.timestamp,
+        }
+        for msg in unread
+    ]
+    return Response(data)

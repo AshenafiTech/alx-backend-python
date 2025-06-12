@@ -1,6 +1,10 @@
 from django.db import models
 from django.conf import settings
 
+class UnreadMessagesManager(models.Manager):
+    def for_user(self, user):
+        return self.get_queryset().filter(receiver=user, read=False).only('id', 'sender', 'content', 'timestamp')
+
 class Message(models.Model):
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='sent_messages', on_delete=models.CASCADE
@@ -24,7 +28,11 @@ class Message(models.Model):
         blank=True,
         related_name='replies',
         on_delete=models.CASCADE
-    )  # For threaded replies
+    )
+    read = models.BooleanField(default=False)  # Indicates if message has been read
+
+    objects = models.Manager()  # Default manager
+    unread = UnreadMessagesManager()  # Custom manager
 
     def __str__(self):
         return f"From {self.sender} to {self.receiver} at {self.timestamp}"
