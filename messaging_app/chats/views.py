@@ -42,3 +42,23 @@ class MessageViewSet(viewsets.ModelViewSet):
         )
         serializer = self.get_serializer(message)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+@cache_page(60)  # Cache this view for 60 seconds
+def conversation_messages(request, conversation_id):
+    """
+    Display all messages in a conversation, cached for 60 seconds.
+    """
+    messages = Message.objects.filter(conversation_id=conversation_id).select_related('sender', 'receiver')
+    data = [
+        {
+            "id": msg.id,
+            "sender": msg.sender_id,
+            "receiver": msg.receiver_id,
+            "content": msg.content,
+            "timestamp": msg.timestamp,
+        }
+        for msg in messages
+    ]
+    return Response(data)
