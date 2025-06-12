@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from django.views.decorators.cache import cache_page
 from .models import Message
 
 @api_view(['DELETE'])
