@@ -22,13 +22,14 @@ def get_conversation_with_threads(conversation_id):
     )
     return messages
 
-def get_thread(message):
-    """Recursively get all replies for a message."""
+def get_thread_queryset(message):
+    """Recursively fetch all replies to a message using Django ORM."""
+    replies = Message.objects.filter(parent_message=message).select_related('sender', 'receiver')
     thread = []
-    for reply in message.replies.all():
+    for reply in replies:
         thread.append({
             'message': reply,
-            'replies': get_thread(reply)
+            'replies': get_thread_queryset(reply)
         })
     return thread
 
