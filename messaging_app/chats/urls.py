@@ -9,5 +9,7 @@ router.register(r'messages', MessageViewSet, basename='message')
 app_name = 'chats'
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include('chats.urls')),
     path('', include(router.urls)),
 ]
