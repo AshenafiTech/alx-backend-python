@@ -6,6 +6,8 @@ router = DefaultRouter()
 router.register(r'conversations', ConversationViewSet, basename='conversation')
 router.register(r'messages', MessageViewSet, basename='message')
 
+app_name = 'chats'
+
 urlpatterns = [
     path('', include(router.urls)),
 ]
