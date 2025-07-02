@@ -11,18 +11,20 @@ class User(AbstractUser):
 
 class Conversation(models.Model):
     """Tracks which users are involved in a conversation."""
+    conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     participants = models.ManyToManyField(User, related_name='conversations')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Conversation {self.pk} between {[user.username for user in self.participants.all()]}"
+        return f"Conversation {self.conversation_id} between {[user.username for user in self.participants.all()]}"
 
 class Message(models.Model):
     """Message model containing sender and conversation."""
+    message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE)
     sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
-    content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    message_body = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Message from {self.sender.username} at {self.timestamp}"
+        return f"Message from {self.sender.username} at {self.sent_at}"
