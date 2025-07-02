@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: "${GITHUB_CREDENTIALS}", url: 'https://github.com/your-username/your-repo.git', branch: 'main'
+                git credentialsId: "${GITHUB_CREDENTIALS}", url: 'https://github.com/AshenafiTech/alx-backend-python/tree/main/messaging_app', branch: 'main'
             }
         }
         stage('Install dependencies') {
