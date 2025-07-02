@@ -1,13 +1,13 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    """Custom user model extending Django's AbstractUser.
-    Add extra fields here if needed (e.g., profile_picture, bio, etc.)
-    """
-    # Example extra field:
-    # bio = models.TextField(blank=True, null=True)
-    pass
+    """Custom user model extending Django's AbstractUser with extra fields."""
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    # password, first_name, last_name are already included in AbstractUser
 
 class Conversation(models.Model):
     """Tracks which users are involved in a conversation."""
