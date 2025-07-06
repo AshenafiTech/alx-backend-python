@@ -1,14 +1,14 @@
-from datetime import datetime, time
-from django.http import HttpResponseForbidden
+from datetime import datetime
+from django.utils.deprecation import MiddlewareMixin
 
-class RestrictAccessByTimeMiddleware:
+class RequestLoggingMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        now = datetime.now().time()
-        # Allow access only between 6PM (18:00) and 9PM (21:00)
-        if not (time(18, 0) <= now <= time(21, 0)):
-            return HttpResponseForbidden('Access to the messaging app is only allowed between 6PM and 9PM.')
-        return self.get_response(request)
-    
+        user = request.user if request.user.is_authenticated else 'Anonymous'
+        log_entry = f"{datetime.now()} - User: {user} - Path: {request.path}\n"
+        with open('requests.log', 'a') as log_file:
+            log_file.write(log_entry)
+        response = self.get_response(request)
+        return response
