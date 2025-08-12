@@ -19,7 +19,14 @@ class IsParticipantOfConversation(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated
 
-class IsMessageOwnerOrParticipant(permissions.BasePermission):
+
+class IsMessageParticipantAndSafeOrUnsafe(permissions.BasePermission):
+    """
+    Only participants in a conversation can send, view, update, or delete messages.
+    """
     def has_object_permission(self, request, view, obj):
-        # For messages, check if user is participant of the conversation
-        return request.user in obj.conversation.participants.all()
+        # Only allow if user is a participant in the conversation
+        is_participant = request.user in obj.conversation.participants.all()
+        if request.method in ["GET", "PUT", "PATCH", "DELETE", "POST"]:
+            return is_participant
+        return False
