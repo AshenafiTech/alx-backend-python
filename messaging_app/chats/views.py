@@ -49,9 +49,18 @@ class ConversationViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(conversation)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+from .pagination import CustomMessagePagination
+
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsMessageOwnerOrParticipant]
+    pagination_class = CustomMessagePagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = MessageFilter
+    search_fields = ['message_body']
+    ordering_fields = ['sent_at']
+    ordering = ['-sent_at']
 
     def get_queryset(self):
         conversation = self.get_conversation()
