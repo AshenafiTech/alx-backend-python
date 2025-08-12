@@ -1,3 +1,5 @@
+# Ignore minikube binary
+minikube-linux-amd64
 venv/
 __pycache__
 .vscode/
